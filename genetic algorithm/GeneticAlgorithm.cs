@@ -10,31 +10,13 @@ namespace genetic_algorithm
 {
     class GeneticAlgorithm
     {
-        private static readonly int INTERVALS_COUNT = 500;
         private Random random = new Random();
-        private Label text;
         private StringBuilder textAll = new StringBuilder();
 
         public string TextAll { get => textAll.ToString(); }
 
-        public GeneticAlgorithm(Label text)
-        {
-            this.text = text;
-        }
-
         public GeneticAlgorithm()
         {
-        }
-
-        public void printGenome(List<Chromosome> genome)
-        {
-            int i = 0;
-            foreach (Chromosome c in genome)
-            {
-                textAll.Append("["+ i++ + "]" +c.BinaryValue + " " + c.DecimalValue + "\n");
-                System.Console.WriteLine(c.BinaryValue + " " + c.DecimalValue);
-            }
-          
         }
 
         public Chromosome Evolution(int chromosomesCount, int iterationsCount, double crossingoverChance, double mutationChance)
@@ -43,10 +25,11 @@ namespace genetic_algorithm
 
             double minInterval = FitnessFunction.minInterval;
             double maxInterval = FitnessFunction.maxInterval;
-                                     
 
-            int chromosomesSize = ValuesUtil.getChromosomeSize(INTERVALS_COUNT * (int)(maxInterval - minInterval));
-            int currentCount = 0; //количество итераций
+            int intervalsCount = (int)(maxInterval - minInterval) * 100;
+
+            int chromosomesSize = ValuesUtil.getChromosomeSize(intervalsCount * (int)(maxInterval - minInterval));
+            int currentCount = 0; 
 
             List<Chromosome> genome = CreateGenome(chromosomesSize, chromosomesCount);
             foreach (Chromosome c in genome)
@@ -71,7 +54,7 @@ namespace genetic_algorithm
                 {
                     if(random.NextDouble() <= crossingoverChance)
                     {
-                        textAll.Append("Crossingover with chance " + crossingoverChance + "\n");
+                        textAll.Append("Кроссинговер с шансом " + crossingoverChance + "\n");
                         System.Console.WriteLine("Crossingover with chance " + crossingoverChance);
                         Crossingover(genome, chromosome, minInterval, maxInterval);
                     }
@@ -79,7 +62,7 @@ namespace genetic_algorithm
                     string binary = chromosome.BinaryValue;
                     if (random.NextDouble() <= mutationChance)
                     {
-                        textAll.Append("Mutation with chance " + mutationChance + "\n");
+                        textAll.Append("Мутация с шансом " + mutationChance + "\n");
                         System.Console.WriteLine("Mutation with chance " + mutationChance);
                         chromosome.BinaryValue = Mutation(binary);
                         chromosome.DecimalValue = ValuesUtil.getChromosomeValue(chromosome.BinaryValue, minInterval, maxInterval);
@@ -92,8 +75,6 @@ namespace genetic_algorithm
                     chromosome.FunctionValue = functionValue;
                 }
 
-
-                // ?????????????????
                 genome.AddRange(CreateGenome(chromosomesSize, chromosomesCount - genome.Count));
 
                 foreach (Chromosome c in genome)
@@ -158,11 +139,11 @@ namespace genetic_algorithm
 
             List<Chromosome> newGenome = new List<Chromosome>();
 
-            textAll.Append("Reproduction:\n");
+            textAll.Append("Репродукция:\n");
             foreach (Chromosome c in genome)
             {
                 long count = (long)Math.Round((c.FunctionValue / fValuesSum) * chromosomesCount);
-                textAll.Append("C repeats " + count + ", " + c.BinaryValue + " " + c.DecimalValue + "\n");
+                textAll.Append("Хромосома повторяется " + count + ", " + c.BinaryValue + " " + c.DecimalValue + "\n");
                 for (int i = 0; i < count; i++)
                 {
                     newGenome.Add(c); 
@@ -177,9 +158,9 @@ namespace genetic_algorithm
             Chromosome mother = getParents(genome, father);
             if (mother != null)
             {
-                textAll.Append("Mother " + mother.BinaryValue + "\n");
+                textAll.Append("Мать " + mother.BinaryValue + "\n");
                 System.Console.WriteLine("Mother " + mother.BinaryValue);
-                textAll.Append("Father " + father.BinaryValue + "\n");
+                textAll.Append("Отец " + father.BinaryValue + "\n");
                 System.Console.WriteLine("Father " + father.BinaryValue);
 
                 GetChildBySinglePointCrossingover(father, mother, minInterval, maxInterval);
@@ -249,7 +230,7 @@ namespace genetic_algorithm
         private void GetChildBySinglePointCrossingover(Chromosome father, Chromosome mother, double minInterval, double maxInterval)
         {
             int k = random.Next(father.BinaryValue.Length);
-            textAll.Append("K = " + k + "and size = " + father.BinaryValue.Count() +"\n");
+            textAll.Append("K = " + k + " ,размер = " + father.BinaryValue.Count() +"\n");
             StringBuilder child1 = new StringBuilder();
             StringBuilder child2 = new StringBuilder();
 
@@ -257,11 +238,11 @@ namespace genetic_algorithm
             child1.Append(mother.BinaryValue.Substring(k, mother.BinaryValue.Length - k));
             child2.Append(mother.BinaryValue.Substring(0, k));
             child2.Append(father.BinaryValue.Substring(k, father.BinaryValue.Length - k));
-            textAll.Append("Child 1 " + father.BinaryValue.Substring(0, k) + "_" + mother.BinaryValue.Substring(k, mother.BinaryValue.Length - k) + "\n");
-            textAll.Append("Child 2 " + mother.BinaryValue.Substring(0, k) + "_" + father.BinaryValue.Substring(k, father.BinaryValue.Length - k) + "\n");
+            textAll.Append("Ребеночек 1 " + father.BinaryValue.Substring(0, k) + "_" + mother.BinaryValue.Substring(k, mother.BinaryValue.Length - k) + "\n");
+            textAll.Append("Ребеночек 2 " + mother.BinaryValue.Substring(0, k) + "_" + father.BinaryValue.Substring(k, father.BinaryValue.Length - k) + "\n");
 
-            father.reCreate(child1.ToString());
-            mother.reCreate(child2.ToString());
+            father.ReCreate(child1.ToString());
+            mother.ReCreate(child2.ToString());
             father.DecimalValue = ValuesUtil.getChromosomeValue(child1.ToString(), minInterval, maxInterval);
             mother.DecimalValue = ValuesUtil.getChromosomeValue(child2.ToString(), minInterval, maxInterval);
 
@@ -282,7 +263,16 @@ namespace genetic_algorithm
             }
             return child.ToString();
         }
+        public void printGenome(List<Chromosome> genome)
+        {
+            int i = 0;
+            foreach (Chromosome c in genome)
+            {
+                textAll.Append("[" + i++ + "]" + c.BinaryValue + " " + c.DecimalValue + "\n");
+                System.Console.WriteLine(c.BinaryValue + " " + c.DecimalValue);
+            }
 
-      
+        }
+
     }
 }

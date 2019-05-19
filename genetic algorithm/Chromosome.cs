@@ -26,7 +26,7 @@ namespace genetic_algorithm
             this.binaryValue = binaryValue;
         }
 
-        public void reCreate(string binaryValue)
+        public void ReCreate(string binaryValue)
         {
             this.binaryValue = binaryValue;
             this.decimalValue = 0;
